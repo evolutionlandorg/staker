@@ -13,14 +13,8 @@ contract StakingRewardsFactory is Ownable {
     // the staking tokens for which the rewards contract has been deployed
     address[] public stakingTokens;
 
-    // info about rewards for a particular staking token
-    struct StakingRewardsInfo {
-        address stakingRewards;
-        uint rewardAmount;
-    }
-
     // rewards info by staking token
-    mapping(address => StakingRewardsInfo) public stakingRewardsInfoByStakingToken;
+    mapping(address => address) public stakingRewardsInfoByStakingToken;
 
     constructor(
         address _rewardsToken,
@@ -36,42 +30,35 @@ contract StakingRewardsFactory is Ownable {
 
     // deploy a staking reward contract for the staking token, and store the reward amount
     // the reward will be distributed to the staking reward contract no sooner than the genesis
-    function deploy(address stakingToken, uint rewardAmount) public onlyOwner {
-        StakingRewardsInfo storage info = stakingRewardsInfoByStakingToken[stakingToken];
-        require(info.stakingRewards == address(0), 'StakingRewardsFactory::deploy: already deployed');
+    function deploy(address stakingToken) public onlyOwner {
+        require(stakingRewardsInfoByStakingToken[stakingToken] == address(0), 'StakingRewardsFactory::deploy: already deployed');
 
-        info.stakingRewards = address(new StakingRewards(/*_rewardsDistribution=*/ address(this), rewardsToken, stakingToken));
-        info.rewardAmount = rewardAmount;
+        stakingRewardsInfoByStakingToken[stakingToken] = address(new StakingRewards(/*_rewardsDistribution=*/ address(this), rewardsToken, stakingToken));
         stakingTokens.push(stakingToken);
     }
 
     ///// permissionless functions
 
     // call notifyRewardAmount for all staking tokens.
-    function notifyRewardAmounts() public {
+    function notifyRewardAmounts(uint256 rewardAmount) public {
         require(stakingTokens.length > 0, 'StakingRewardsFactory::notifyRewardAmounts: called before any deploys');
         for (uint i = 0; i < stakingTokens.length; i++) {
-            notifyRewardAmount(stakingTokens[i]);
+            notifyRewardAmount(stakingTokens[i], rewardAmount);
         }
     }
 
     // notify reward amount for an individual staking token.
     // this is a fallback in case the notifyRewardAmounts costs too much gas to call for all contracts
-    function notifyRewardAmount(address stakingToken) public {
+    function notifyRewardAmount(address stakingToken, uint256 rewardAmount) public {
         require(block.timestamp >= stakingRewardsGenesis, 'StakingRewardsFactory::notifyRewardAmount: not ready');
 
-        StakingRewardsInfo storage info = stakingRewardsInfoByStakingToken[stakingToken];
-        require(info.stakingRewards != address(0), 'StakingRewardsFactory::notifyRewardAmount: not deployed');
-
-        if (info.rewardAmount > 0) {
-            uint rewardAmount = info.rewardAmount;
-            info.rewardAmount = 0;
-
-            require(
-                IERC20(rewardsToken).transfer(info.stakingRewards, rewardAmount),
-                'StakingRewardsFactory::notifyRewardAmount: transfer failed'
-            );
-            StakingRewards(info.stakingRewards).notifyRewardAmount(rewardAmount);
-        }
+        address stakingRewards = stakingRewardsInfoByStakingToken[stakingToken];
+        require(stakingRewards != address(0), 'StakingRewardsFactory::notifyRewardAmount: not deployed');
+        require(rewardAmount > 0, 'StakingRewardsFactory::notifyRewardAmount: reward is zero');
+        require(
+            IERC20(rewardsToken).transfer(stakingRewards, rewardAmount),
+            'StakingRewardsFactory::notifyRewardAmount: transfer failed'
+        );
+        StakingRewards(stakingRewards).notifyRewardAmount(rewardAmount);
     }
 }
