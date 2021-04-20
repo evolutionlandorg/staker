@@ -18,7 +18,6 @@ package apr
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/big"
 	"time"
@@ -100,7 +99,6 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 
 func (a *APR) getDailyReward(pool string) (*big.Int, error) {
 	isOver, err := a.isRewardPeriodOver(pool)
-	fmt.Println("isOver: ", isOver)
 	if err != nil {
 		return Big0, err
 	}
