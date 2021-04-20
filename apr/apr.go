@@ -26,7 +26,7 @@ import (
 
 var Big0 = big.NewInt(0)
 var Big1 = big.NewInt(1)
-var Big19250 = big.NewInt(19250)
+var Big18250 = big.NewInt(18250)
 
 type APR struct {
 	b       Backend
@@ -38,7 +38,7 @@ func New(b Backend, decimal int) *APR {
 }
 
 // APR(%) = 385 * 100 * dailyReward / ( 2 * reverseRing)
-// APR(%) = 19250 * dailyReward / reserveRingInPool
+// APR(%) = 18250 * dailyReward / reserveRingInPool
 func (a *APR) Calc(pool, ring string) (float64, error) {
 	rewardToken, err := a.b.RewardsToken(pool)
 	if err != nil {
@@ -55,7 +55,7 @@ func (a *APR) Calc(pool, ring string) (float64, error) {
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
 	}
-	apr := new(Fraction).Div(NewFraction(new(big.Int).Mul(Big19250, dailyReward), Big1), reserveRingInPool)
+	apr := new(Fraction).Div(NewFraction(new(big.Int).Mul(Big18250, dailyReward), Big1), reserveRingInPool)
 	return apr.toFixed(a.decimal), nil
 }
 

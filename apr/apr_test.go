@@ -78,4 +78,8 @@ func TestAPR(t *testing.T) {
 		t.Failed()
 	}
 	t.Log("apr: ", apr)
+	var expectedAPR = 19825.68
+	if apr != expectedAPR {
+		t.Errorf("Got %v expected %v", apr, expectedAPR)
+	}
 }

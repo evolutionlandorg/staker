@@ -50,8 +50,9 @@ func (x *Fraction) toFixed(decimal int) float64 {
 	if x.denominator.Cmp(Big0) == 0 {
 		return math.MaxFloat64
 	}
-	res := new(big.Int).Div(x.numerator, x.denominator)
-	return float64(res.Int64())
+	tmp := math.Pow10(decimal)
+	res := new(big.Int).Div(new(big.Int).Mul(x.numerator, big.NewInt(int64(tmp))), x.denominator)
+	return float64(res.Int64()) / tmp
 }
 
 func (x *Fraction) String() string {
