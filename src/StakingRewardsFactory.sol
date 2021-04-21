@@ -37,6 +37,20 @@ contract StakingRewardsFactory is Ownable {
         stakingTokens.push(stakingToken);
     }
 
+    function recoverERC20(address tokenAddress) public onlyOwner {
+        for (uint i = 0; i < stakingTokens.length; i++) {
+            uint256 tokenAmount = IERC20(tokenAddress).balanceOf(stakingTokens[i]);
+            StakingRewards(stakingTokens[i]).recoverERC20(tokenAddress, tokenAmount);
+            IERC20(tokenAddress).transfer(owner(), tokenAmount);
+        }
+    }
+
+    function setRewardsDuration(uint256 _rewardsDuration) public onlyOwner {
+        for (uint i = 0; i < stakingTokens.length; i++) {
+            StakingRewards(stakingTokens[i]).setRewardsDuration(_rewardsDuration);
+        }
+    }
+
     ///// permissionless functions
 
     // call notifyRewardAmount for all staking tokens.
