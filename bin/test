@@ -9,13 +9,16 @@ for i in {0..4}; do
   seth call $STAKINGREWARDS_FACTORY "stakingRewardsInfoByStakingToken(address)(address)" $stakingToken 
 done
 
-rewardAmount=$(seth --to-uint256 $(seth --to-wei 100000 ether))
-seth send $TOKEN_ERC20_RING "transfer(address,uint256)" $STAKINGREWARDS_FACTORY $rewardAmount
+STAKINGTOKEN=$(seth call $STAKINGREWARDS_FACTORY "stakingTokens(uint256)(address)" 0) 
+STAKING_LP_GOLD_RING=$(seth call $STAKINGREWARDS_FACTORY "stakingRewardsInfoByStakingToken(address)(address)" $STAKINGTOKEN)
 
-reswardAmountWeek1=$(seth --to-uint256 $(seth --to-wei 600 ether))
-seth send $STAKINGREWARDS_FACTORY "notifyRewardAmounts(uint256)" $reswardAmountWeek1
-
-STAKING_LP_GOLD_RING=0x0CE88f43bFA23F2627757267B4EEc8f1911e2d75
 seth send $TOKEN_LP_GOLD_RING "approve(address,uint256)" $STAKING_LP_GOLD_RING $(seth --to-int256 -1) 
 stake=$(seth --to-uint256 $(seth --to-wei 1 ether))
 seth send $STAKING_LP_GOLD_RING "stake(uint256)" $stake
+
+rewardAmount=$(seth --to-uint256 $(seth --to-wei 540000 ether))
+seth send $TOKEN_ERC20_RING "transfer(address,uint256)" $STAKINGREWARDS_FACTORY $rewardAmount
+
+reswardAmountWeek1=$(seth --to-uint256 $(seth --to-wei 108000 ether))
+seth send $STAKINGREWARDS_FACTORY "notifyRewardAmounts(uint256)" $reswardAmountWeek1
+

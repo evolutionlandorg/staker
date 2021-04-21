@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+stakingTokens=("$TOKEN_LP_GOLD_RING" "$TOKEN_LP_WOOD_RING" "$TOKEN_LP_WATER_RING" "$TOKEN_LP_FIRE_RING" "$TOKEN_LP_SOIL_RING")
+echo $stakingTokens
+for stakingToken in "${stakingTokens[@]}}"; do
+  seth send $STAKINGREWARDS_FACTORY "deploy(address)" "$stakingToken" 
+done
+
+
+

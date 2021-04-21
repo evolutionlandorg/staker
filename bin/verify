@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+STAKINGTOKEN=$(seth call $STAKINGREWARDS_FACTORY "stakingTokens(uint256)(address)" 0) 
+STAKING_LP_GOLD_RING=$(seth call $STAKINGREWARDS_FACTORY "stakingRewardsInfoByStakingToken(address)(address)" $STAKINGTOKEN)
+dapp --use solc:0.5.16 verify-contract src/StakingRewards.sol:StakingRewards $STAKING_LP_GOLD_RING $STAKINGREWARDS_FACTORY $TOKEN_ERC20_RING $TOKEN_LP_GOLD_RING

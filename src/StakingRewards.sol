@@ -21,8 +21,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
     IERC20 public stakingToken;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
-    // uint256 public rewardsDuration = 7 days;
-    uint256 public rewardsDuration = 1 days;
+    uint256 public rewardsDuration = 90 days;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
@@ -69,7 +68,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
     }
 
     function earned(address account) public view returns (uint256) {
-      return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
+        return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
     }
 
     function getRewardForDuration() external view returns (uint256) {

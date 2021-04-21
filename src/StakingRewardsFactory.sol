@@ -39,15 +39,21 @@ contract StakingRewardsFactory is Ownable {
 
     function recoverERC20(address tokenAddress) public onlyOwner {
         for (uint i = 0; i < stakingTokens.length; i++) {
-            uint256 tokenAmount = IERC20(tokenAddress).balanceOf(stakingTokens[i]);
-            StakingRewards(stakingTokens[i]).recoverERC20(tokenAddress, tokenAmount);
-            IERC20(tokenAddress).transfer(owner(), tokenAmount);
+            address stakingRewards = stakingRewardsInfoByStakingToken[stakingTokens[i]];
+            require(stakingRewards != address(0), 'StakingRewardsFactory::notifyRewardAmount: not deployed');
+            uint256 tokenAmount = IERC20(tokenAddress).balanceOf(stakingRewards);
+            if (tokenAmount > 0) {
+                StakingRewards(stakingRewards).recoverERC20(tokenAddress, tokenAmount);
+                IERC20(tokenAddress).transfer(owner(), tokenAmount);
+            }
         }
     }
 
     function setRewardsDuration(uint256 _rewardsDuration) public onlyOwner {
         for (uint i = 0; i < stakingTokens.length; i++) {
-            StakingRewards(stakingTokens[i]).setRewardsDuration(_rewardsDuration);
+            address stakingRewards = stakingRewardsInfoByStakingToken[stakingTokens[i]];
+            require(stakingRewards != address(0), 'StakingRewardsFactory::notifyRewardAmount: not deployed');
+            StakingRewards(stakingRewards).setRewardsDuration(_rewardsDuration);
         }
     }
 

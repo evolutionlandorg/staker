@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+STAKINGTOKEN=$(seth call $STAKINGREWARDS_FACTORY "stakingTokens(uint256)(address)" 0) 
+STAKING_LP_GOLD_RING=$(seth call $STAKINGREWARDS_FACTORY "stakingRewardsInfoByStakingToken(address)(address)" $STAKINGTOKEN)
+seth send $TOKEN_ERC20_GOLD "transfer(address,uint256)" $STAKING_LP_GOLD_RING $(seth --to-wei 1 ether)
+seth send $STAKINGREWARDS_FACTORY "recoverERC20(address)" $TOKEN_ERC20_GOLD
