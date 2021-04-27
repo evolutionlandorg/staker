@@ -36,7 +36,7 @@ func New(b Backend, decimal int) *APR {
 	return &APR{b, decimal}
 }
 
-// APR(%) = 385 * 100 * dailyReward / ( 2 * reverseRing)
+// APR(%) = 365 * 100 * dailyReward / ( 2 * reverseRing)
 // APR(%) = 18250 * dailyReward / reserveRingInPool
 func (a *APR) Calc(pool, ring string) (float64, error) {
 	rewardToken, err := a.b.RewardsToken(pool)
