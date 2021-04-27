@@ -6,7 +6,7 @@ set -e
 
 rewardsToken=$TOKEN_ERC20_RING
 stakingRewardsGenesis=$(seth block "latest" timestamp)
-stakingRewardsGenesis=$(bc <<< "$stakingRewardsGenesis + 10 * 60")
+stakingRewardsGenesis=$(bc <<< "$stakingRewardsGenesis + 3 * 60")
 STAKINGREWARDS_FACTORY=$(dapp create src/StakingRewardsFactory.sol:StakingRewardsFactory "$rewardsToken" "$stakingRewardsGenesis")
 addAddress "STAKINGREWARDS_FACTORY" "$STAKINGREWARDS_FACTORY"
 echo >&2 "${0##*/}: info: StakingRewardsFactory created."
