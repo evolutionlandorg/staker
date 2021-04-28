@@ -28,3 +28,4 @@ Claim earned RING
 #### `exit()`
 Withdraw all staked liquidity token and Claim earned RING to exit
 
+### [Mathematical Proof](./doc/staker.pdf)
