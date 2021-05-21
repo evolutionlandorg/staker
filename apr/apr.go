@@ -44,7 +44,7 @@ func (a *APR) Calc(pool, ring string) (float64, error) {
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
 	}
-	if strings.EqualFold(rewardToken, ring) {
+	if !strings.EqualFold(rewardToken, ring) {
 		return math.SmallestNonzeroFloat64, errors.New("Not support")
 	}
 	reserveRingInPool, err := a.getReserveRingInPool(pool, ring)
@@ -77,9 +77,9 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 	if err != nil {
 		return nil, err
 	}
-	if ring == token0 {
+	if strings.EqualFold(ring, token0) {
 		reserveRing = reserve0
-	} else if ring == token1 {
+	} else if strings.EqualFold(ring, token1) {
 		reserveRing = reserve1
 	} else {
 		return nil, errors.New("RING not in pair")
