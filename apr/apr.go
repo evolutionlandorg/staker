@@ -20,6 +20,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"strings"
 	"time"
 )
 
@@ -43,7 +44,7 @@ func (a *APR) Calc(pool, ring string) (float64, error) {
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
 	}
-	if rewardToken != ring {
+	if strings.EqualFold(rewardToken, ring) {
 		return math.SmallestNonzeroFloat64, errors.New("Not support")
 	}
 	reserveRingInPool, err := a.getReserveRingInPool(pool, ring)
