@@ -64,7 +64,7 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 		return nil, err
 	}
 	var reserveRing *big.Int
-	reserve0, reserve1, err := a.b.GetReserves(lpToken)
+	reserve0, reserve1, _, err := a.b.GetReserves(lpToken)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 	} else {
 		return nil, errors.New("RING not in pair")
 	}
-	totalStakedLPAmount, err := a.b.BalanceOf(lpToken, pool)
+	totalStakedLPAmount, err := a.b.PairBalanceOf(lpToken, pool)
 	if err != nil {
 		return nil, err
 	}
