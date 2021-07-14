@@ -2,7 +2,6 @@ pragma solidity ^0.5.16;
 
 import "zeppelin-solidity/math/Math.sol";
 import "zeppelin-solidity/math/SafeMath.sol";
-import "zeppelin-solidity/token/ERC20/ERC20Detailed.sol";
 import "zeppelin-solidity/token/ERC20/SafeERC20.sol";
 import "zeppelin-solidity/utils/ReentrancyGuard.sol";
 import 'zeppelin-solidity/ownership/Ownable.sol';
@@ -144,7 +143,11 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
 
     // Added to support recovering LP Rewards from other systems such as BAL to be distributed to holders
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        // Cannot recover the staking token or the rewards token
+        require(
+            tokenAddress != address(stakingToken) && tokenAddress != address(rewardsToken),
+            "Cannot withdraw the staking token"
+        );
         IERC20(tokenAddress).safeTransfer(owner(), tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
