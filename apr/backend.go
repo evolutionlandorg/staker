@@ -26,9 +26,9 @@ type Backend interface {
 	RewardRate(pool string) (*big.Int, error)
 
 	// UniswapV2Pair.sol
-	BalanceOf(lpToken, pool string) (*big.Int, error)
+	PairBalanceOf(lpToken, pool string) (*big.Int, error)
 	TotalSupply(lpToken string) (*big.Int, error)
 	Token0(lpToken string) (string, error)
 	Token1(lpToken string) (string, error)
-	GetReserves(lpToken string) (reserve0, reserve1 *big.Int, err error)
+	GetReserves(lpToken string) (reserve0, reserve1 *big.Int, blockTimestampLast int64, err error)
 }

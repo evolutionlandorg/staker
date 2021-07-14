@@ -35,7 +35,7 @@ func (m *MockBackend) StakingToken(pool string) (string, error) {
 }
 
 func (m *MockBackend) PeriodFinish(pool string) (int64, error) {
-	return 1619914394, nil
+	return 3619914394, nil
 }
 
 func (m *MockBackend) RewardRate(pool string) (*big.Int, error) {
@@ -43,7 +43,7 @@ func (m *MockBackend) RewardRate(pool string) (*big.Int, error) {
 }
 
 // UniswapV2Pair.sol
-func (m *MockBackend) BalanceOf(lpToken string, pool string) (*big.Int, error) {
+func (m *MockBackend) PairBalanceOf(lpToken string, pool string) (*big.Int, error) {
 	return U256("0x1acfad219a54b20000"), nil
 }
 
@@ -59,8 +59,8 @@ func (m *MockBackend) Token1(lpToken string) (string, error) {
 	return "0xb6a07a36fa73758ce9d58a2c6a8da74cecca438d", nil
 }
 
-func (m *MockBackend) GetReserves(lpToken string) (reserve0 *big.Int, reserve1 *big.Int, err error) {
-	return U256("0x5d910fcf4294380000"), U256("0x12bc13a49741276000"), nil
+func (m *MockBackend) GetReserves(lpToken string) (reserve0 *big.Int, reserve1 *big.Int, blockTimestampLast int64, err error) {
+	return U256("0x5d910fcf4294380000"), U256("0x12bc13a49741276000"), 0, nil
 }
 
 func U256(v string) *big.Int {
