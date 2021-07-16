@@ -4,13 +4,12 @@ import "zeppelin-solidity/math/Math.sol";
 import "zeppelin-solidity/math/SafeMath.sol";
 import "zeppelin-solidity/token/ERC20/SafeERC20.sol";
 import "zeppelin-solidity/utils/ReentrancyGuard.sol";
-import 'zeppelin-solidity/ownership/Ownable.sol';
 
 // Inheritance
 import "./interfaces/IStakingRewards.sol";
 import "./RewardsDistributionRecipient.sol";
 
-contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, ReentrancyGuard, Ownable {
+contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -36,7 +35,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
         address _rewardsDistribution,
         address _rewardsToken,
         address _stakingToken
-    ) Ownable() public {
+    ) public {
         rewardsToken = IERC20(_rewardsToken);
         stakingToken = IERC20(_stakingToken);
         rewardsDistribution = _rewardsDistribution;
@@ -141,18 +140,17 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
         emit RewardAdded(reward);
     }
 
-    // Added to support recovering LP Rewards from other systems such as BAL to be distributed to holders
-    function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
+    function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyRewardsDistribution {
         // Cannot recover the staking token or the rewards token
         require(
             tokenAddress != address(stakingToken) && tokenAddress != address(rewardsToken),
             "Cannot withdraw the staking token"
         );
-        IERC20(tokenAddress).safeTransfer(owner(), tokenAmount);
+        IERC20(tokenAddress).safeTransfer(rewardsDistribution, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
 
-    function setRewardsDuration(uint256 _rewardsDuration) external onlyOwner {
+    function setRewardsDuration(uint256 _rewardsDuration) external onlyRewardsDistribution {
         require(
             block.timestamp > periodFinish,
             "Previous rewards period must be complete before changing the duration for the new period"

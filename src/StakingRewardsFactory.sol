@@ -80,4 +80,9 @@ contract StakingRewardsFactory is DSAuth {
         );
         StakingRewards(stakingRewards).notifyRewardAmount(rewardAmount);
     }
+
+    function recover(address tokenAddress) public auth {
+        uint256 tokenAmount = IERC20(tokenAddress).balanceOf(address(this));
+        IERC20(tokenAddress).transfer(owner, tokenAmount);
+    }
 }
