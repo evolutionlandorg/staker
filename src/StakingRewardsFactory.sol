@@ -44,9 +44,9 @@ contract StakingRewardsFactory is DSAuth {
             uint256 tokenAmount = IERC20(tokenAddress).balanceOf(stakingRewards);
             if (tokenAmount > 0) {
                 StakingRewards(stakingRewards).recoverERC20(tokenAddress, tokenAmount);
-                IERC20(tokenAddress).transfer(owner, tokenAmount);
             }
         }
+        recover(tokenAddress);
     }
 
     function setRewardsDuration(uint256 _rewardsDuration) public auth {
