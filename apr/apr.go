@@ -39,7 +39,7 @@ func New(b Backend, decimal int) *APR {
 
 // APR(%) = 365 * 100 * dailyReward / ( 2 * reverseRing)
 // APR(%) = 18250 * dailyReward / reserveRingInPool
-func (a *APR) Calc(pool, ring string) (float64, error) {
+func (a *APR) Calc(pool, base, ring string, transformer *Fraction) (float64, error) {
 	rewardToken, err := a.b.RewardsToken(pool)
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
@@ -47,10 +47,11 @@ func (a *APR) Calc(pool, ring string) (float64, error) {
 	if !strings.EqualFold(rewardToken, ring) {
 		return math.SmallestNonzeroFloat64, errors.New("Not support")
 	}
-	reserveRingInPool, err := a.getReserveRingInPool(pool, ring)
+	reserveBaseInPool, err := a.getReserveBaseInPool(pool, base)
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
 	}
+	reserveRingInPool := new(Fraction).Mul(reserveBaseInPool, transformer)
 	dailyReward, err := a.getDailyReward(pool)
 	if err != nil {
 		return math.SmallestNonzeroFloat64, err
@@ -59,12 +60,12 @@ func (a *APR) Calc(pool, ring string) (float64, error) {
 	return apr.toFixed(a.decimal), nil
 }
 
-func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
+func (a *APR) getReserveBaseInPool(pool, base string) (*Fraction, error) {
 	lpToken, err := a.b.StakingToken(pool)
 	if err != nil {
 		return nil, err
 	}
-	var reserveRing *big.Int
+	var reserveBase *big.Int
 	reserve0, reserve1, _, err := a.b.GetReserves(lpToken)
 	if err != nil {
 		return nil, err
@@ -77,10 +78,10 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 	if err != nil {
 		return nil, err
 	}
-	if strings.EqualFold(ring, token0) {
-		reserveRing = reserve0
-	} else if strings.EqualFold(ring, token1) {
-		reserveRing = reserve1
+	if strings.EqualFold(base, token0) {
+		reserveBase = reserve0
+	} else if strings.EqualFold(base, token1) {
+		reserveBase = reserve1
 	} else {
 		return nil, errors.New("RING not in pair")
 	}
@@ -93,7 +94,7 @@ func (a *APR) getReserveRingInPool(pool, ring string) (*Fraction, error) {
 		return nil, err
 	}
 	return &Fraction{
-		numerator:   new(big.Int).Mul(reserveRing, totalStakedLPAmount),
+		numerator:   new(big.Int).Mul(reserveBase, totalStakedLPAmount),
 		denominator: totalLPAmount,
 	}, nil
 }
