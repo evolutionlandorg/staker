@@ -665,7 +665,6 @@ interface IUniswapV2ERC20_1 {
 contract StakingRewardsFactory is DSAuth {
     // immutables
     address public rewardsToken;
-    uint public stakingRewardsGenesis;
 
     // the staking tokens for which the rewards contract has been deployed
     address[] public stakingTokens;
@@ -674,13 +673,9 @@ contract StakingRewardsFactory is DSAuth {
     mapping(address => address) public stakingRewardsInfoByStakingToken;
 
     constructor(
-        address _rewardsToken,
-        uint _stakingRewardsGenesis
+        address _rewardsToken
     ) DSAuth() public {
-        require(_stakingRewardsGenesis >= block.timestamp, 'StakingRewardsFactory::constructor: genesis too soon');
-
         rewardsToken = _rewardsToken;
-        stakingRewardsGenesis = _stakingRewardsGenesis;
     }
 
     ///// permissioned functions
@@ -716,18 +711,17 @@ contract StakingRewardsFactory is DSAuth {
 
     // call notifyRewardAmount for all staking tokens.
     function notifyRewardAmounts(uint256 rewardAmount) public auth {
-        require(stakingTokens.length > 0, 'StakingRewardsFactory::notifyRewardAmounts: called before any deploys');
-        uint256 rewardEachAmount = rewardAmount / stakingTokens.length;
-        for (uint i = 0; i < stakingTokens.length; i++) {
-            notifyRewardAmount(stakingTokens[i], rewardEachAmount);
+        if (stakingTokens.length > 0) {
+            uint256 rewardEachAmount = rewardAmount / stakingTokens.length;
+            for (uint i = 0; i < stakingTokens.length; i++) {
+                notifyRewardAmount(stakingTokens[i], rewardEachAmount);
+            }
         }
     }
 
     // notify reward amount for an individual staking token.
     // this is a fallback in case the notifyRewardAmounts costs too much gas to call for all contracts
     function notifyRewardAmount(address stakingToken, uint256 rewardAmount) public auth {
-        require(block.timestamp >= stakingRewardsGenesis, 'StakingRewardsFactory::notifyRewardAmount: not ready');
-
         address stakingRewards = stakingRewardsInfoByStakingToken[stakingToken];
         require(stakingRewards != address(0), 'StakingRewardsFactory::notifyRewardAmount: not deployed');
         require(rewardAmount > 0, 'StakingRewardsFactory::notifyRewardAmount: reward is zero');
